@@ -25,12 +25,16 @@ const typeDefs = `#graphql
     name: String!
     username: String!
     email: String!
-    password: String!
+    password: String
   }
 
   type Query {
     users: [User]
     userByUsername(username: String): [User]
+  }
+
+  type Mutation {
+    postUser(_id: String, name: String, username: String, email: String, password: String): User
   }
 `;
 
@@ -43,6 +47,13 @@ const resolvers = {
             })
             return filteredUsers
         },
+    },
+    Mutation: {
+        postUser: (_, { _id, name, username, email, password }) => {
+            const newUser = { _id, name, username, email, password }
+            usersData.push(newUser)
+            return newUser
+        }
     }
 }
 
