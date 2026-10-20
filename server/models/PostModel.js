@@ -55,6 +55,24 @@ class PostModel {
         )
         return comment
     }
+
+    static async likePost(postId, username) {
+        const createdAt = new Date()
+        const like = {
+            username,
+            createdAt,
+            updatedAt: createdAt
+        }
+        await this.collection().updateOne(
+            { _id: new ObjectId(postId) },
+            {
+                $push: {
+                    likes: like
+                }
+            }
+        )
+        return like
+    }
 }
 
 module.exports = PostModel;

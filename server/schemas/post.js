@@ -118,6 +118,7 @@ const typeDefs = `#graphql
   type Mutation {
     addPost(content: String!, tags: [String!], imgUrl: String): Post!
     addComment(postId:String, content:String): Comment
+    addLike(postId:String): Like
   }
 `;
 
@@ -163,6 +164,15 @@ const resolvers = {
                 throw new Error('Content required')
             }
             return await PostModel.commentPost(postId, content, loginInfo.username)
+        },
+        addLike: async (_, { postId }, contextValue) => {
+            const loginInfo = await contextValue.auth()
+            if (!postId) {
+                throw new Error('Post Id required')
+            }
+
+            return await PostModel.likePost(postId, loginInfo.username)
+
         }
     }
 }
