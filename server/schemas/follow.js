@@ -1,3 +1,5 @@
+const FollowModel = require("../models/FollowModel");
+
 const followsData = [
     {
         followingId: "66f1a2b3c4d5e6f789012342",
@@ -31,11 +33,27 @@ const typeDefs = `#graphql
   type Query {
     follows: [Follow]
   }
+
+  type Mutation {
+    followAccount(idFollowing:String): String
+  }
 `;
 
 const resolvers = {
     Query: {
         follows: () => followsData,
+    },
+    Mutation: {
+        followAccount: async (_, { idFollowing }, contextValue) => {
+            const loginInfo = await contextValue.auth()
+
+            if (!idFollowing) {
+                throw new Error('User Id required')
+            }
+
+            await FollowModel.addFollow(idFollowing, loginInfo._id)
+            return `Follow Success`
+        }
     }
 }
 
