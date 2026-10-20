@@ -1,3 +1,5 @@
+const PostModel = require("../models/PostModel");
+
 const postsData = [
     {
         _id: "66f1b2c3d4e5f60789012301",
@@ -86,7 +88,7 @@ const typeDefs = `#graphql
     _id: ID!
     content: String!
     tags: [String!]
-    imgUrl: String!
+    imgUrl: String
     authorId: ID!
     comments: [Comment!]
     likes: [Like!]
@@ -111,6 +113,10 @@ const typeDefs = `#graphql
     posts: [Post]
     postByTag(tag: String): [Post]
   }
+
+  type Mutation {
+    addPost(content: String!, tags: [String!], imgUrl: String): Post!
+  }
 `;
 
 const resolvers = {
@@ -121,6 +127,17 @@ const resolvers = {
                 return post.tags.includes(args.tag)
             })
             return filteredTags
+        }
+    },
+    Mutation: {
+        addPost: async (_, { content, tags = [], imgUrl }, contextValue) => {
+            const loginInfo = await contextValue.auth();
+
+            if (!content) {
+                throw new Error("Content is required");
+            }
+
+            return await PostModel.addPost(content, tags, imgUrl ?? null, loginInfo._id);
         }
     }
 }
