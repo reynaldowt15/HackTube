@@ -1,3 +1,5 @@
+const UserModel = require("../models/UserModel");
+
 const usersData = [
     {
         _id: "66f1a2b3c4d5e6f789012341",
@@ -25,7 +27,12 @@ const typeDefs = `#graphql
     name: String!
     username: String!
     email: String!
-    password: String!
+  }
+
+  type registerResponse {
+    _id: ID!
+    username: String!
+    email: String!
   }
 
   type Query {
@@ -34,13 +41,16 @@ const typeDefs = `#graphql
   }
 
   type Mutation {
-    postUser(_id: String, name: String, username: String, email: String, password: String): User
+    register(name: String, username: String, email: String, password: String): registerResponse
   }
 `;
 
 const resolvers = {
     Query: {
-        users: () => usersData,
+        users: () => {
+            const users = UserModel.getAllUsers();
+            return users;
+        },
         userByUsername: (_, args) => {
             const filteredUsers = usersData.filter((user) => {
                 return user.username === args.username
@@ -48,11 +58,25 @@ const resolvers = {
             return filteredUsers
         },
     },
+
     Mutation: {
-        postUser: (_, { _id, name, username, email, password }) => {
-            const newUser = { _id, name, username, email, password }
-            usersData.push(newUser)
-            return newUser
+        register: async (_, { name, username, email, password }) => {
+            if (!name || !username || !email || !password) {
+                throw new Error("Name, Username, Email, and Password are required")
+            }
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    throw new Error("Invalid email format");
+                }
+            }
+
+            if (password.length < 5) {
+                throw new Error("Password must be at least 5 characters long");
+            }
+
+            const newUser = await UserModel.addUser(name, username, email, password)
+            return { _id: newUser.insertedId, username, email }
         }
     }
 }
