@@ -36,6 +36,25 @@ class PostModel {
             updatedAt: createdAt.toISOString(),
         };
     }
+
+    static async commentPost(postId, content, username) {
+        const createdAt = new Date()
+        const comment = {
+            content,
+            username,
+            createdAt,
+            updatedAt: createdAt
+        }
+        await this.collection().updateOne(
+            { _id: new ObjectId(postId) },
+            {
+                $push: {
+                    comments: comment
+                }
+            }
+        )
+        return comment
+    }
 }
 
 module.exports = PostModel;

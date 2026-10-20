@@ -117,6 +117,7 @@ const typeDefs = `#graphql
 
   type Mutation {
     addPost(content: String!, tags: [String!], imgUrl: String): Post!
+    addComment(postId:String, content:String): Comment
   }
 `;
 
@@ -152,6 +153,16 @@ const resolvers = {
             }
 
             return await PostModel.addPost(content, tags, imgUrl ?? null, loginInfo._id);
+        },
+        addComment: async (_, { postId, content }, contextValue) => {
+            const loginInfo = await contextValue.auth()
+            if (!postId) {
+                throw new Error('Post Id required')
+            }
+            if (!content) {
+                throw new Error('Content required')
+            }
+            return await PostModel.commentPost(postId, content, loginInfo.username)
         }
     }
 }

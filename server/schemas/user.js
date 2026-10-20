@@ -117,7 +117,7 @@ const resolvers = {
                 throw new Error("Invalid Email or Password")
             }
 
-            const token = sign({ _id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' })
+            const token = sign({ _id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1d' })
             return { token }
         }
     }
