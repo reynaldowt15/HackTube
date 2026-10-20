@@ -6,8 +6,15 @@ class UserModel {
         return database.collection('Users');
     }
 
-    static async getAllUsers() {
-        return await this.collection().find().toArray();
+    static async getAllUsers(search = '') {
+        return await this.collection()
+            .find({
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { username: { $regex: search, $options: 'i' } },
+                ]
+            })
+            .toArray();
     }
 
     static async addUser(name, username, email, password) {

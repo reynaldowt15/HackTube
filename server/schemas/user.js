@@ -1,6 +1,7 @@
 const UserModel = require("../models/UserModel");
 const { compareSync } = require("bcryptjs")
-const { sign } = require("jsonwebtoken")
+const { sign } = require("jsonwebtoken");
+const { ObjectId } = require("mongodb");
 
 const usersData = [
     {
@@ -43,7 +44,8 @@ const typeDefs = `#graphql
 
   type Query {
     users: [User]
-    userByUsername(username: String): [User]
+    userByUsernameOrName(search: String): [User]
+    userById(_id:String): User
   }
 
   type Mutation {
@@ -58,12 +60,15 @@ const resolvers = {
             const users = UserModel.getAllUsers();
             return users;
         },
-        userByUsername: (_, args) => {
-            const filteredUsers = usersData.filter((user) => {
-                return user.username === args.username
-            })
-            return filteredUsers
+        userByUsernameOrName: async (_, { search }) => {
+            const users = await UserModel.getAllUsers(search)
+            return users
         },
+        userById: async (_, { _id }, contextValue) => {
+            await contextValue.auth()
+            const user = await UserModel.getUserByQuery({ _id: new ObjectId(_id) })
+            return user
+        }
     },
 
     Mutation: {
