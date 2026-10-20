@@ -111,6 +111,7 @@ const typeDefs = `#graphql
 
   type Query {
     posts: [Post]
+    postById(postId:String): Post
     postByTag(tag: String): [Post]
   }
 
@@ -121,9 +122,19 @@ const typeDefs = `#graphql
 
 const resolvers = {
     Query: {
-        posts: async () => {
+        posts: async (_, __, contextValue) => {
+            await contextValue.auth()
             const posts = await PostModel.getAllPosts()
             return posts
+        },
+        postById: async (_, { postId }, contextValue) => {
+            await contextValue.auth()
+            if (!postId) {
+                throw new Error('Post Id required')
+            }
+
+            const post = await PostModel.getPostById(postId)
+            return post
         },
         postByTag: (_, args) => {
             const filteredTags = postsData.filter((post) => {

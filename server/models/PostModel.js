@@ -10,6 +10,10 @@ class PostModel {
         return await this.collection().find().sort({ _id: -1 }).toArray();
     }
 
+    static async getPostById(postId) {
+        return await this.collection().findOne({ _id: new ObjectId(postId) })
+    }
+
     static async addPost(content, tags, imgUrl, authorId) {
         const createdAt = new Date();
         const post = {
