@@ -1,4 +1,6 @@
 const UserModel = require("../models/UserModel");
+const { compareSync } = require("bcryptjs")
+const { sign } = require("jsonwebtoken")
 
 const usersData = [
     {
@@ -34,6 +36,10 @@ const typeDefs = `#graphql
     username: String!
     email: String!
   }
+  
+  type loginResponse {
+    token: String!
+  }
 
   type Query {
     users: [User]
@@ -42,6 +48,7 @@ const typeDefs = `#graphql
 
   type Mutation {
     register(name: String, username: String, email: String, password: String): registerResponse
+    login(email: String, password: String): loginResponse
   }
 `;
 
@@ -77,6 +84,36 @@ const resolvers = {
 
             const newUser = await UserModel.addUser(name, username, email, password)
             return { _id: newUser.insertedId, username, email }
+        },
+
+        login: async (_, { email, password }) => {
+            if (!email || !password) {
+                throw new Error("Email and Password are required")
+            }
+
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    throw new Error("Invalid email format");
+                }
+            }
+
+            if (password.length < 5) {
+                throw new Error("Password must be at least 5 characters long");
+            }
+
+            const user = await UserModel.getUserByQuery({ email })
+            if (!user) {
+                throw new Error("Invalid Email or Password")
+            }
+
+            const validPassword = compareSync(password, user.password)
+            if (!validPassword) {
+                throw new Error("Invalid Email or Password")
+            }
+
+            const token = sign({ _id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' })
+            return { token }
         }
     }
 }

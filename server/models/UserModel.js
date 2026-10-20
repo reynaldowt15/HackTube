@@ -24,6 +24,10 @@ class UserModel {
         const hashedPassword = hashSync(password, 10);
         return await database.collection('Users').insertOne({ name, username, email, password: hashedPassword });
     }
+
+    static async getUserByQuery(query) {
+        return await this.collection().findOne(query)
+    }
 }
 
 module.exports = UserModel
