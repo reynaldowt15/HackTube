@@ -121,7 +121,10 @@ const typeDefs = `#graphql
 
 const resolvers = {
     Query: {
-        posts: () => postsData,
+        posts: async () => {
+            const posts = await PostModel.getAllPosts()
+            return posts
+        },
         postByTag: (_, args) => {
             const filteredTags = postsData.filter((post) => {
                 return post.tags.includes(args.tag)
