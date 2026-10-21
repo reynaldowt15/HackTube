@@ -94,7 +94,7 @@ const resolvers = {
                 throw new Error("Password must be at least 5 characters long");
             }
 
-            const user = await UserModel.getUserByQuery({ email })
+            const user = await UserModel.getUserByEmail(email)
             if (!user) {
                 throw new Error("Invalid Email or Password")
             }

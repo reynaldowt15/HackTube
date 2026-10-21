@@ -6,6 +6,10 @@ class UserModel {
         return database.collection('Users');
     }
 
+    static async getUserByEmail(email) {
+        return await this.collection().findOne({ email })
+    }
+
     static async getAllUsers(search = '') {
         return await this.collection()
             .find({
