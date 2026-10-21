@@ -33,7 +33,51 @@ class UserModel {
     }
 
     static async getUserByQuery(query) {
-        return await this.collection().findOne(query)
+        const agg = [
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    'password': 0
+                }
+            }, {
+                '$lookup': {
+                    'from': 'Follows',
+                    'localField': '_id',
+                    'foreignField': 'followingId',
+                    'as': 'FollowerRelation'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'Users',
+                    'localField': 'FollowerRelation.followerId',
+                    'foreignField': '_id',
+                    'as': 'followers'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'Follows',
+                    'localField': '_id',
+                    'foreignField': 'followerId',
+                    'as': 'FollowingRelation'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'Users',
+                    'localField': 'FollowingRelation.followingId',
+                    'foreignField': '_id',
+                    'as': 'following'
+                }
+            }, {
+                '$project': {
+                    'FollowerRelation': 0,
+                    'FollowingRelation': 0,
+                    'followers.password': 0,
+                    'following.password': 0
+                }
+            }
+        ];
+        return await this.collection().aggregate(agg).next()
     }
 }
 
