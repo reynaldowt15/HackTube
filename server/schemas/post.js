@@ -52,7 +52,7 @@ const resolvers = {
             }
 
             const posts = await PostModel.getAllPosts()
-            await redis.set(REDIS_POSTS_KEY, JSON.stringify(posts))
+            await redis.set(REDIS_POSTS_KEY, JSON.stringify(posts), "EX", 60)
             return posts
         },
         postById: async (_, { postId }, contextValue) => {

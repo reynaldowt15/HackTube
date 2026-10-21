@@ -7,11 +7,57 @@ class PostModel {
     }
 
     static async getAllPosts() {
-        return await this.collection().find().sort({ _id: -1 }).toArray();
+        const agg = [
+            {
+                '$lookup': {
+                    'from': 'Users',
+                    'localField': 'authorId',
+                    'foreignField': '_id',
+                    'as': 'Author'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$Author',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$project': {
+                    'Author.password': 0
+                }
+            }, {
+                '$sort': {
+                    '_id': -1
+                }
+            }
+        ];
+
+        return await this.collection().aggregate(agg).toArray();
     }
 
     static async getPostById(postId) {
-        return await this.collection().findOne({ _id: new ObjectId(postId) })
+        const agg = [
+            {
+                '$match': { _id: new ObjectId(postId) }
+            }, {
+                '$lookup': {
+                    'from': 'Users',
+                    'localField': 'authorId',
+                    'foreignField': '_id',
+                    'as': 'Author'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$Author',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$project': {
+                    'Author.password': 0
+                }
+            }
+        ];
+
+        return await this.collection().aggregate(agg).next()
     }
 
     static async addPost(content, tags, imgUrl, authorId) {
