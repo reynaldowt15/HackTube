@@ -3,33 +3,14 @@ const { compareSync } = require("bcryptjs")
 const { sign } = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
 
-const usersData = [
-    {
-        _id: "66f1a2b3c4d5e6f789012341",
-        name: "Reynaldo Tendean",
-        username: "reynaldo",
-        email: "reynaldo@example.com",
-    },
-    {
-        _id: "66f1a2b3c4d5e6f789012342",
-        name: "Sarah Johnson",
-        username: "sarah",
-        email: "sarah@example.com",
-    },
-    {
-        _id: "66f1a2b3c4d5e6f789012343",
-        name: "Michael Chen",
-        username: "michael",
-        email: "michael@example.com",
-    },
-];
-
 const typeDefs = `#graphql
   type User {
     _id: ID!
     name: String!
     username: String!
     email: String!
+    followers: [User]
+    following: [User]
   }
 
   type registerResponse {
@@ -45,7 +26,7 @@ const typeDefs = `#graphql
   type Query {
     users: [User]
     userByUsernameOrName(search: String): [User]
-    userById(_id:String): User
+    userById: User
   }
 
   type Mutation {
@@ -56,17 +37,22 @@ const typeDefs = `#graphql
 
 const resolvers = {
     Query: {
-        users: () => {
+        users: async (_, __, contextValue) => {
+            await contextValue.auth()
+
             const users = UserModel.getAllUsers();
             return users;
         },
-        userByUsernameOrName: async (_, { search }) => {
+        userByUsernameOrName: async (_, { search }, contextValue) => {
+            await contextValue.auth()
+
             const users = await UserModel.getAllUsers(search)
             return users
         },
-        userById: async (_, { _id }, contextValue) => {
-            await contextValue.auth()
-            const user = await UserModel.getUserByQuery({ _id: new ObjectId(_id) })
+        userById: async (_, __, contextValue) => {
+            const loginInfo = await contextValue.auth()
+
+            const user = await UserModel.getUserByQuery({ _id: new ObjectId(loginInfo._id) })
             return user
         }
     },
@@ -76,6 +62,7 @@ const resolvers = {
             if (!name || !username || !email || !password) {
                 throw new Error("Name, Username, Email, and Password are required")
             }
+
             if (email) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
