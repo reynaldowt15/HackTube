@@ -2,6 +2,7 @@ import { Link } from "@react-navigation/native";
 import { useState } from "react";
 import { Button, StatusBar, StyleSheet, Text, TextInput, View } from "react-native";
 import PrimaryButton from "../components/primaryButton";
+import { componentStyle } from "../styles/componentStyle";
 
 export default function RegisterScreen() {
     const [firstName, setFirstName] = useState('')
@@ -11,7 +12,7 @@ export default function RegisterScreen() {
     const [password, setPassword] = useState('')
 
     return (
-        <View style={styles.container}>
+        <View style={componentStyle.container}>
             <View style={{ width: '100%', gap: 8 }}>
                 <Text>Name</Text>
                 <View style={{
@@ -20,13 +21,13 @@ export default function RegisterScreen() {
                 }}>
                     <TextInput
                         placeholder="First name"
-                        style={{ ...styles.input, flex: 1 }}
+                        style={{ ...componentStyle.input, flex: 1 }}
                         value={firstName}
                         onChangeText={(text) => { setFirstName(text) }}
                     />
                     <TextInput
                         placeholder="Surname"
-                        style={{ ...styles.input, flex: 1 }}
+                        style={{ ...componentStyle.input, flex: 1 }}
                         value={lastName}
                         onChangeText={(text) => { setLastName(text) }}
                     />
@@ -36,7 +37,7 @@ export default function RegisterScreen() {
                 <Text>Username</Text>
                 <TextInput
                     placeholder="johndoe / janedoe"
-                    style={styles.input}
+                    style={componentStyle.input}
                     value={username}
                     onChangeText={(text) => { setUsername(text) }}
                     autoCapitalize="none"
@@ -45,7 +46,7 @@ export default function RegisterScreen() {
 
                 <Text>E-mail</Text>
                 <TextInput
-                    style={styles.input}
+                    style={componentStyle.input}
                     placeholder="example@mail.com"
                     value={email}
                     onChangeText={(text) => { setEmail(text) }}
@@ -55,7 +56,7 @@ export default function RegisterScreen() {
 
                 <Text>Password</Text>
                 <TextInput
-                    style={styles.input}
+                    style={componentStyle.input}
                     value={password}
                     onChangeText={(text) => { setPassword(text) }}
                     secureTextEntry={true}
@@ -70,19 +71,3 @@ export default function RegisterScreen() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16
-    },
-    input: {
-        borderColor: "gray",
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 8,
-    },
-});
