@@ -1,9 +1,9 @@
 import { Button } from "react-native";
 
-export default function PrimaryButton({ title, onPress }) {
+export default function PrimaryButton({ label, onPress }) {
     return (
         <Button
-            title={title}
+            title={label}
             onPress={onPress}
         />
     )

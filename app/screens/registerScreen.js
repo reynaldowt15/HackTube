@@ -1,6 +1,6 @@
-import { Link } from "@react-navigation/native";
+import { Link, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Button, StatusBar, StyleSheet, Text, TextInput, View } from "react-native";
+import { StatusBar, Text, TextInput, View } from "react-native";
 import PrimaryButton from "../components/primaryButton";
 import { componentStyle } from "../styles/componentStyle";
 
@@ -10,6 +10,12 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+
+    const navigation = useNavigation()
+
+    const pressRegister = () => {
+        navigation.navigate('Login')
+    }
 
     return (
         <View style={componentStyle.container}>
@@ -63,7 +69,7 @@ export default function RegisterScreen() {
                     autoCapitalize="none"
                 />
 
-                <PrimaryButton title={'Register'} onPress={() => { }} />
+                <PrimaryButton title={'Register'} onPress={pressRegister} />
                 <Text style={{ alignSelf: 'center' }}>Already have an account ? <Link screen={'Login'}>Login</Link></Text>
 
             </View>
