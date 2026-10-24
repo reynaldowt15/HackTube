@@ -1,23 +1,21 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from './screens/loginScreen';
-import RegisterScreen from './screens/registerScreen';
 import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ApolloProvider } from '@apollo/client/react'
 
-const Stack = createNativeStackNavigator();
-
-function RootStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='Login' component={LoginScreen} />
-      <Stack.Screen name='Register' component={RegisterScreen} />
-    </Stack.Navigator>
-  )
-}
+import AuthContextProvider from './context/authContext';
+import RootStack from './navigations/root';
+import client from './config/apollo';
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <RootStack />
-    </NavigationContainer>
+    <AuthContextProvider>
+      <ApolloProvider client={client}>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <RootStack />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </ApolloProvider>
+    </AuthContextProvider>
   );
 }
