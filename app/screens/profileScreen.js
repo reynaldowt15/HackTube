@@ -14,7 +14,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { gql } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client/react";
-import { COLORS, SPACING, FONT_SIZE } from "../styles/theme";
+import { AVATAR_COLORS, COLORS, FONT_SIZE, RADIUS, SPACING } from "../styles/theme";
+import { commonStyles } from "../styles/commonStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../components/primaryButton";
 import { deleteItemAsync } from "expo-secure-store";
@@ -63,15 +64,7 @@ const FOLLOW_ACCOUNT = gql`
 `;
 
 function Avatar({ username, size = 48 }) {
-    const colors = [
-        "#DCEBFF",
-        "#FFE3D8",
-        "#E4F5E8",
-        "#F0E2FF",
-        "#FFF0BD",
-    ];
-
-    const colorIndex = (username?.length ?? 0) % colors.length;
+    const colorIndex = (username?.length ?? 0) % AVATAR_COLORS.length;
 
     return (
         <View
@@ -81,7 +74,7 @@ function Avatar({ username, size = 48 }) {
                     width: size,
                     height: size,
                     borderRadius: size / 2,
-                    backgroundColor: colors[colorIndex],
+                    backgroundColor: AVATAR_COLORS[colorIndex],
                 },
             ]}
         >
@@ -98,7 +91,7 @@ function Avatar({ username, size = 48 }) {
 }
 
 export default function ProfileScreen() {
-    const { setIsSignIn } = useContext(AuthContext)
+    const { setIsSignIn } = useContext(AuthContext);
 
     const [search, setSearch] = useState("");
 
@@ -180,7 +173,7 @@ export default function ProfileScreen() {
 
     if (profileLoading) {
         return (
-            <View style={styles.centered}>
+            <View style={commonStyles.centered}>
                 <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
         );
@@ -188,26 +181,26 @@ export default function ProfileScreen() {
 
     if (profileError) {
         return (
-            <View style={styles.centered}>
+            <View style={commonStyles.centered}>
                 <Ionicons
                     name="alert-circle-outline"
                     size={45}
                     color={COLORS.primary}
                 />
 
-                <Text style={styles.errorTitle}>
+                <Text style={commonStyles.errorTitle}>
                     Unable to load profile
                 </Text>
 
-                <Text style={styles.errorMessage}>
+                <Text style={commonStyles.errorMessage}>
                     {profileError.message}
                 </Text>
 
                 <Pressable
-                    style={styles.retryButton}
+                    style={commonStyles.retryButton}
                     onPress={() => refetchProfile()}
                 >
-                    <Text style={styles.retryText}>Try again</Text>
+                    <Text style={commonStyles.retryText}>Try again</Text>
                 </Pressable>
             </View>
         );
@@ -243,7 +236,7 @@ export default function ProfileScreen() {
                         </View>
                     </View>
 
-                    <PrimaryButton title={'Logout'} onPress={handleLogout} loading={false} />
+                    <PrimaryButton title="Logout" onPress={handleLogout} />
 
                     {/* Followers and following */}
                     <View style={styles.statsContainer}>
@@ -287,13 +280,13 @@ export default function ProfileScreen() {
                         <Ionicons
                             name="search-outline"
                             size={21}
-                            color="COLORS.secondaryText"
+                            color={COLORS.secondaryText}
                         />
 
                         <TextInput
                             style={styles.searchInput}
                             placeholder="Search name or username..."
-                            placeholderTextColor="#909090"
+                            placeholderTextColor={COLORS.muted}
                             value={search}
                             onChangeText={setSearch}
                             autoCapitalize="none"
@@ -309,7 +302,7 @@ export default function ProfileScreen() {
                                 <Ionicons
                                     name="close-circle"
                                     size={20}
-                                    color="#909090"
+                                    color={COLORS.muted}
                                 />
                             </Pressable>
                         )}
@@ -332,7 +325,7 @@ export default function ProfileScreen() {
                                     <Ionicons
                                         name="person-outline"
                                         size={30}
-                                        color="#909090"
+                                        color={COLORS.muted}
                                     />
 
                                     <Text style={styles.emptyText}>
@@ -416,7 +409,7 @@ export default function ProfileScreen() {
                             <Ionicons
                                 name="people-outline"
                                 size={36}
-                                color="#909090"
+                                color={COLORS.muted}
                             />
 
                             <Text style={styles.emptyFollowingTitle}>
@@ -476,7 +469,7 @@ export default function ProfileScreen() {
                             <Ionicons
                                 name="people-outline"
                                 size={36}
-                                color="#909090"
+                                color={COLORS.muted}
                             />
 
                             <Text style={styles.emptyFollowingTitle}>
@@ -511,8 +504,8 @@ export default function ProfileScreen() {
                                 <View style={styles.followingBadge}>
                                     <Ionicons
                                         name="checkmark"
-                                        size={15}
-                                        color="COLORS.secondaryText"
+                                        size={FONT_SIZE.sm}
+                                        color={COLORS.secondaryText}
                                     />
 
                                     <Text style={styles.followingBadgeText}>
@@ -536,16 +529,9 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
     },
     scrollContent: {
-        paddingBottom: 35,
+        paddingBottom: SPACING.xxl,
     },
 
-    centered: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 24,
-        backgroundColor: COLORS.background,
-    },
 
     profileSection: {
         paddingHorizontal: SPACING.xl,
@@ -554,7 +540,7 @@ const styles = StyleSheet.create({
     profileTop: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 18,
+        gap: SPACING.lg,
     },
 
     avatar: {
@@ -581,13 +567,13 @@ const styles = StyleSheet.create({
     username: {
         color: COLORS.secondaryText,
         fontSize: FONT_SIZE.md,
-        marginTop: 4,
+        marginTop: SPACING.xs,
     },
 
     email: {
         color: COLORS.secondaryText,
         fontSize: FONT_SIZE.xs,
-        marginTop: 4,
+        marginTop: SPACING.xs,
     },
 
     statsContainer: {
@@ -616,13 +602,13 @@ const styles = StyleSheet.create({
 
     statDivider: {
         width: 1,
-        height: 30,
+        height: SPACING.xxl - 2,
         backgroundColor: COLORS.border,
     },
 
     profileDivider: {
         height: StyleSheet.hairlineWidth,
-        backgroundColor: "#E5E5E5",
+        backgroundColor: COLORS.border,
     },
 
     searchSection: {
@@ -637,37 +623,37 @@ const styles = StyleSheet.create({
     },
 
     sectionSubtitle: {
-        color: "COLORS.secondaryText",
+        color: COLORS.secondaryText,
         fontSize: FONT_SIZE.md,
-        marginTop: 6,
+        marginTop: SPACING.sm,
     },
 
     searchInputWrapper: {
         minHeight: 50,
         flexDirection: "row",
         alignItems: "center",
-        gap: 10,
-        paddingHorizontal: 14,
-        marginTop: 17,
+        gap: SPACING.sm,
+        paddingHorizontal: SPACING.md,
+        marginTop: SPACING.md,
         borderWidth: 1,
-        borderColor: "#D9D9D9",
-        borderRadius: 25,
-        backgroundColor: "#F9F9F9",
+        borderColor: COLORS.border,
+        borderRadius: RADIUS.pill,
+        backgroundColor: COLORS.surface,
     },
 
     searchInput: {
         flex: 1,
         color: COLORS.text,
-        fontSize: 14,
+        fontSize: FONT_SIZE.sm,
         paddingVertical: SPACING.md,
     },
 
     resultsContainer: {
-        marginTop: 10,
+        marginTop: SPACING.md,
     },
 
     searchLoader: {
-        padding: 20,
+        padding: SPACING.lg,
     },
 
     userCard: {
@@ -682,36 +668,36 @@ const styles = StyleSheet.create({
     },
 
     userName: {
-        fontSize: 14,
+        fontSize: FONT_SIZE.sm,
         fontWeight: "700",
         color: COLORS.text,
     },
 
     userUsername: {
-        color: "COLORS.secondaryText",
+        color: COLORS.secondaryText,
         fontSize: FONT_SIZE.md,
-        marginTop: 4,
+        marginTop: SPACING.xs,
     },
 
     followButton: {
         backgroundColor: COLORS.primary,
-        paddingHorizontal: 18,
-        paddingVertical: 10,
-        borderRadius: 22,
+        paddingHorizontal: SPACING.lg,
+        paddingVertical: SPACING.sm,
+        borderRadius: RADIUS.pill,
     },
 
     followButtonText: {
-        color: "#FFFFFF",
+        color: COLORS.white,
         fontSize: FONT_SIZE.md,
         fontWeight: "700",
     },
 
     followingButton: {
-        backgroundColor: "#F2F2F2",
+        backgroundColor: COLORS.surfaceMuted,
     },
 
     followingButtonText: {
-        color: "COLORS.secondaryText",
+        color: COLORS.secondaryText,
     },
 
     disabledButton: {
@@ -720,86 +706,63 @@ const styles = StyleSheet.create({
 
     emptyResults: {
         alignItems: "center",
-        padding: 22,
-        gap: 8,
+        padding: SPACING.xl,
+        gap: SPACING.sm,
     },
 
     emptyText: {
-        color: "COLORS.secondaryText",
+        color: COLORS.secondaryText,
         fontSize: FONT_SIZE.md,
         textAlign: "center",
     },
 
     followingSection: {
-        paddingHorizontal: 20,
-        paddingTop: 30,
+        paddingHorizontal: SPACING.xl,
+        paddingTop: SPACING.xl,
     },
 
     followingHeader: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 10,
+        marginBottom: SPACING.md,
     },
 
     followingCount: {
         fontSize: FONT_SIZE.md,
-        color: "COLORS.secondaryText",
+        color: COLORS.secondaryText,
     },
 
     followingBadge: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 5,
-        backgroundColor: "#F2F2F2",
-        paddingHorizontal: 12,
-        paddingVertical: 9,
-        borderRadius: 20,
+        gap: SPACING.xs,
+        backgroundColor: COLORS.surfaceMuted,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        borderRadius: RADIUS.pill,
     },
 
     followingBadgeText: {
-        color: "COLORS.secondaryText",
-        fontSize: 12,
+        color: COLORS.secondaryText,
+        fontSize: FONT_SIZE.xs,
         fontWeight: "600",
     },
 
     emptyFollowing: {
         alignItems: "center",
-        paddingVertical: 30,
-        gap: 10,
+        paddingVertical: SPACING.xl,
+        gap: SPACING.md,
     },
 
     emptyFollowingTitle: {
-        fontSize: 14,
+        fontSize: FONT_SIZE.sm,
         fontWeight: "700",
         color: COLORS.text,
         textAlign: "center",
     },
 
-    errorTitle: {
-        fontSize: 18,
-        fontWeight: "800",
-        color: COLORS.text,
-        marginTop: 12,
-    },
 
-    errorMessage: {
-        color: "COLORS.secondaryText",
-        fontSize: FONT_SIZE.md,
-        textAlign: "center",
-        marginTop: 8,
-    },
 
-    retryButton: {
-        marginTop: 20,
-        backgroundColor: COLORS.primary,
-        paddingHorizontal: 22,
-        paddingVertical: 12,
-        borderRadius: 22,
-    },
 
-    retryText: {
-        color: "#FFFFFF",
-        fontWeight: "700",
-    },
 });

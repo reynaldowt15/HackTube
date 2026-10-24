@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
-import { COLORS } from '../styles/theme';
+import { COLORS, FONT_SIZE, SPACING } from '../styles/theme';
 import HomeScreen from '../screens/homeScreen';
 import CreateScreen from '../screens/createScreen';
 import ProfileScreen from '../screens/profileScreen';
@@ -23,16 +23,17 @@ export default function BottomTabNavigator() {
                 tabBarActiveTintColor: COLORS.primary,
                 tabBarInactiveTintColor: COLORS.secondaryText,
                 tabBarLabelStyle: {
-                    fontSize: 11,
+                    fontSize: FONT_SIZE.xs,
                     fontWeight: '600',
-                    marginBottom: 3,
+                    marginBottom: SPACING.xs - 1,
                 },
                 tabBarStyle: {
                     height: 60,
-                    paddingTop: 6,
-                    paddingBottom: 4,
+                    paddingTop: SPACING.xs + 2,
+                    paddingBottom: SPACING.xs,
                     backgroundColor: COLORS.background,
                     borderTopColor: COLORS.border,
+                    borderTopWidth: 1,
                 },
                 tabBarIcon: ({ focused, color, size }) => {
                     const [activeIcon, inactiveIcon] = TAB_ICONS[route.name];

@@ -1,23 +1,21 @@
-
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Link, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { gql } from "@apollo/client";
-import { useMutation } from "@apollo/client/react";
 
+import AppTextInput from "../components/appTextInput";
 import PrimaryButton from "../components/primaryButton";
-import { COLORS, SPACING, FONT_SIZE } from "../styles/theme";
+import { COLORS, FONT_SIZE, SPACING } from "../styles/theme";
 
 const REGISTER_MUTATION = gql`
   mutation Register(
@@ -40,260 +38,192 @@ const REGISTER_MUTATION = gql`
 `;
 
 export default function RegisterScreen() {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [register, { loading }] = useMutation(REGISTER_MUTATION);
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+  const pressRegister = async () => {
+    try {
+      await register({
+        variables: {
+          name: firstName + " " + lastName,
+          username,
+          email,
+          password,
+        },
+      });
 
-    const [register, { loading }] = useMutation(REGISTER_MUTATION);
+      navigation.navigate("Login");
+    } catch (error) {
+      Alert.alert("Register Failed", error.message);
+    }
+  };
 
-    const pressRegister = async () => {
-        try {
-            await register({
-                variables: {
-                    name: firstName + " " + lastName,
-                    username,
-                    email,
-                    password,
-                },
-            });
+  return (
+    <KeyboardAvoidingView
+      style={styles.screen}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+    >
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={COLORS.background}
+      />
 
-            navigation.navigate("Login");
-        } catch (error) {
-            Alert.alert("Register Failed", error.message);
-        }
-    };
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Create your account</Text>
+            <Text style={styles.subtitle}>
+              Join the community and share your moments.
+            </Text>
+          </View>
 
-    return (
-        <KeyboardAvoidingView
-            style={styles.screen}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-            <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+          <View style={styles.form}>
+            <Text style={styles.label}>Name</Text>
+            <View style={styles.nameRow}>
+              <AppTextInput
+                placeholder="First name"
+                inputStyle={styles.nameInput}
+                value={firstName}
+                onChangeText={setFirstName}
+                autoCapitalize="words"
+              />
+              <AppTextInput
+                placeholder="Surname"
+                inputStyle={styles.nameInput}
+                value={lastName}
+                onChangeText={setLastName}
+                autoCapitalize="words"
+              />
+            </View>
 
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-            >
+            <Text style={styles.label}>Username</Text>
+            <AppTextInput
+              icon="person-outline"
+              placeholder="johndoe"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-                <View style={styles.form}>
-                    <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>E-mail</Text>
+            <AppTextInput
+              icon="mail-outline"
+              placeholder="example@mail.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-                    <View style={styles.nameRow}>
-                        <TextInput
-                            placeholder="First name"
-                            placeholderTextColor={COLORS.muted}
-                            style={[styles.input, styles.nameInput]}
-                            value={firstName}
-                            onChangeText={setFirstName}
-                            autoCapitalize="words"
-                        />
+            <Text style={styles.label}>Password</Text>
+            <AppTextInput
+              icon="lock-closed-outline"
+              placeholder="Create a password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-                        <TextInput
-                            placeholder="Surname"
-                            placeholderTextColor={COLORS.muted}
-                            style={[styles.input, styles.nameInput]}
-                            value={lastName}
-                            onChangeText={setLastName}
-                            autoCapitalize="words"
-                        />
-                    </View>
+            <PrimaryButton
+              title="Register"
+              onPress={pressRegister}
+              loading={loading}
+            />
 
-                    <Text style={styles.label}>Username</Text>
-                    <View style={styles.inputContainer}>
-                        <Ionicons
-                            name="person-outline"
-                            size={19}
-                            color={COLORS.secondaryText}
-                        />
-                        <TextInput
-                            placeholder="johndoe"
-                            placeholderTextColor={COLORS.muted}
-                            style={styles.inputText}
-                            value={username}
-                            onChangeText={setUsername}
-                            autoCapitalize="none"
-                        />
-                    </View>
-
-                    <Text style={styles.label}>E-mail</Text>
-                    <View style={styles.inputContainer}>
-                        <Ionicons
-                            name="mail-outline"
-                            size={19}
-                            color={COLORS.secondaryText}
-                        />
-                        <TextInput
-                            placeholder="example@mail.com"
-                            placeholderTextColor={COLORS.muted}
-                            style={styles.inputText}
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    </View>
-
-                    <Text style={styles.label}>Password</Text>
-                    <View style={styles.inputContainer}>
-                        <Ionicons
-                            name="lock-closed-outline"
-                            size={19}
-                            color={COLORS.secondaryText}
-                        />
-                        <TextInput
-                            placeholder="Create a password"
-                            placeholderTextColor={COLORS.muted}
-                            style={styles.inputText}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                            autoCapitalize="none"
-                        />
-                    </View>
-
-                    <PrimaryButton
-                        title="Register"
-                        onPress={pressRegister}
-                        loading={loading}
-                    />
-
-                    <View style={styles.footer}>
-                        <Text style={styles.footerText}>
-                            Already have an account?{" "}
-                        </Text>
-                        <Link screen="Login" style={styles.loginLink}>
-                            Login
-                        </Link>
-                    </View>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    );
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>
+                Already have an account?
+              </Text>
+              <Link screen="Login" style={styles.loginLink}>
+                Login
+              </Link>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        backgroundColor: COLORS.background,
-    },
-
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: "center",
-        paddingHorizontal: SPACING.xl,
-        paddingVertical: SPACING.xxl,
-    },
-
-    header: {
-        alignItems: "center",
-        marginBottom: SPACING.xxl,
-    },
-
-    logoContainer: {
-        width: 52,
-        height: 38,
-        borderRadius: 11,
-        backgroundColor: COLORS.primary,
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: SPACING.sm,
-    },
-
-    brandName: {
-        fontSize: FONT_SIZE.xl,
-        fontWeight: "800",
-        color: COLORS.text,
-    },
-
-    brandAccent: {
-        color: COLORS.primary,
-    },
-
-    title: {
-        fontSize: FONT_SIZE.xl,
-        fontWeight: "800",
-        color: COLORS.text,
-        marginTop: SPACING.xl,
-    },
-
-    subtitle: {
-        fontSize: FONT_SIZE.sm,
-        color: COLORS.secondaryText,
-        textAlign: "center",
-        marginTop: SPACING.sm,
-    },
-
-    form: {
-        width: "100%",
-        gap: SPACING.sm,
-    },
-
-    label: {
-        fontSize: FONT_SIZE.sm,
-        fontWeight: "600",
-        color: COLORS.text,
-        marginTop: SPACING.sm,
-    },
-
-    nameRow: {
-        flexDirection: "row",
-        gap: SPACING.sm,
-    },
-
-    nameInput: {
-        flex: 1,
-    },
-
-    input: {
-        minHeight: 50,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 12,
-        paddingHorizontal: SPACING.md,
-        fontSize: FONT_SIZE.md,
-        color: COLORS.text,
-        backgroundColor: COLORS.surface,
-    },
-
-    inputContainer: {
-        minHeight: 50,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: SPACING.md,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 12,
-        paddingHorizontal: SPACING.md,
-        backgroundColor: COLORS.surface,
-    },
-
-    inputText: {
-        flex: 1,
-        fontSize: FONT_SIZE.md,
-        color: COLORS.text,
-        paddingVertical: SPACING.md,
-    },
-
-    footer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: SPACING.lg,
-    },
-
-    footerText: {
-        fontSize: FONT_SIZE.sm,
-        color: COLORS.secondaryText,
-    },
-
-    loginLink: {
-        fontSize: FONT_SIZE.sm,
-        color: COLORS.primary,
-        fontWeight: "700",
-    },
+  screen: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
+  content: {
+    width: "100%",
+    maxWidth: 500,
+    alignSelf: "center",
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xxl,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: SPACING.xl,
+  },
+  title: {
+    marginTop: SPACING.xl,
+    color: COLORS.text,
+    fontSize: FONT_SIZE.xl,
+    fontWeight: "800",
+  },
+  subtitle: {
+    marginTop: SPACING.sm,
+    color: COLORS.secondaryText,
+    fontSize: FONT_SIZE.sm,
+    textAlign: "center",
+    lineHeight: 21,
+  },
+  form: {
+    gap: SPACING.sm,
+  },
+  label: {
+    marginTop: SPACING.sm,
+    color: COLORS.text,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: "700",
+  },
+  nameRow: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+  },
+  nameInput: {
+    flex: 1,
+    minWidth: 0,
+  },
+  footer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: SPACING.xs,
+    marginTop: SPACING.lg,
+  },
+  footerText: {
+    color: COLORS.secondaryText,
+    fontSize: FONT_SIZE.sm,
+  },
+  loginLink: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: "800",
+  },
 });
