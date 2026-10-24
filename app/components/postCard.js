@@ -7,17 +7,37 @@ import {
 } from 'react-native';
 import { COLORS, SPACING, FONT_SIZE } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
+function formatDate(value) {
+    if (value == null || value === '') {
+        return '';
+    }
+
+    const date = /^\d+$/.test(String(value).trim())
+        ? new Date(Number(value))
+        : new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    return date.toLocaleDateString('id-ID');
+}
 
 export default function PostCard({ post }) {
+    const navigation = useNavigation()
     return (
         <Pressable
-            onPress={() => { console.log(`postCard Pressed`, post.id) }}
+            onPress={() => {
+                navigation.navigate('Detail', { postId: post._id })
+            }}
         >
             <View style={styles.card}>
 
                 {/* Post image */}
                 <Image
-                    source={{ uri: post.image }}
+                    source={{ uri: post.imgUrl || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png' }}
                     style={styles.postImage}
                     resizeMode="cover"
                 />
@@ -25,12 +45,12 @@ export default function PostCard({ post }) {
                 {/* Caption */}
                 <View style={styles.captionContainer}>
                     <Text style={styles.caption}>
-                        {post.caption}
+                        {post.content}
                     </Text>
 
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Text style={styles.captionUsername}>
-                            {post.username}{' '}
+                            {post.Author.username}{' '}
                         </Text>
 
                         <Text style={styles.secondaryText}>
@@ -38,7 +58,7 @@ export default function PostCard({ post }) {
                                 name="chatbubble-outline"
                                 size={14}
                                 color={COLORS.text}
-                            />{post.comments}{' '}
+                            />{post.comments.length}{' '}
                         </Text>
 
                         <Text style={styles.secondaryText}>
@@ -46,11 +66,11 @@ export default function PostCard({ post }) {
                                 name="heart-outline"
                                 size={14}
                                 color={COLORS.text}
-                            />{post.likes} {'- '}
+                            />{post.likes.length} {'- '}
                         </Text>
 
                         <Text style={styles.secondaryText}>
-                            {post.timeAgo}
+                            {formatDate(post.createdAt)}
                         </Text>
                     </View>
                 </View>
