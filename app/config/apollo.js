@@ -3,7 +3,7 @@ import { SetContextLink } from "@apollo/client/link/context";
 import { getItem } from "expo-secure-store";
 
 const httpLink = new HttpLink({
-    uri: "https://pncktzfg-3000.asse.devtunnels.ms/",
+    uri: "https://hacktube-api.reynaldowt15.id/",
 });
 
 const authLink = new SetContextLink(({ headers }) => {
