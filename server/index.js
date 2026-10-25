@@ -13,11 +13,12 @@ const { ObjectId } = require('mongodb');
 const server = new ApolloServer({
     typeDefs: [userTypeDefs, postTypeDefs, followTypeDefs],
     resolvers: [userResolvers, postResolvers, followResolvers],
+    introspection: true
 });
 
 async function startServer() {
     const { url } = await startStandaloneServer(server, {
-        listen: { port: 3000 },
+        listen: { port: process.env.PORT },
         context: ({ req, res }) => {
             return {
                 auth: async () => {
